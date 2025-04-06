@@ -5,59 +5,51 @@ const path=require("path");
 const session = require("express-session");
 const MongoDBStore=require("connect-mongodb-session")(session);
 const req = require("express/lib/request");
+const { appendFile } = require("fs");
 const port =process.env.PORT || 3000;
-const Post=require("./model/post");
-const month=['Jan',"Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-
-const authRoutes=require("./routers/auth");
-const registerRoutes=require("./routers/register");
-const postRoutes=require("./routers/post");
-const createRoutes=require("./routers/create");
-const readRoutes=require("./routers/read");
-const profileRoutes=require("./routers/profile");
-const detailRoutes=require("./routers/detail");
-const deleteRoutes=require("./routers/delete");
-
 
 const MONGODB_URI="mongodb+srv://partiksehrawat06:LKPGFvyAPC3NZGqA@collegeenagementapp.mwhtmbh.mongodb.net";
 
-const store=new MongoDBStore({uri:MONGODB_URI,collection:"sessions"});
-
 const app=express();
+
+const store=new MongoDBStore({uri:MONGODB_URI,collection:"sessions"});
 app.use(bodyparser.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname,'public')));
 app.set("view engine","ejs");
 app.use(session({secret: "my secret", resave: false, saveUninitialized: false, store: store}));
 
-app.get('/',async(req,res)=>{
+
+const authRoutes=require("./routers/auth");
+const createRoutes=require("./routers/create-quiz");
+const profileRoutes=require("./routers/profile");
+const readRoutes=require("./routers/read");
+const quizRoutes=require("./routers/quiz");
+const detailsRoutes=require("./routers/details");
+
+app.get("/",async(req,res)=>{
     const isLoggedIn=req.session.isLoggedIn;
     const user=req.session.username;
-    let blogs=await Post.find({});
-    let l=blogs.length;
-    // console.log(l,l-5);
-    let l1=0;
-    if(l-5>0)
-        l1=l-5;
-    blogs=blogs.slice(l1,l);
-    res.render("home.ejs",{isLoggedIn,user,blogs,month});
+    
+    if(isLoggedIn)
+    {
+        res.redirect("/profile");
+    }
+    else
+        res.redirect("/signup");
 });
 
-app.use(registerRoutes);
-app.use(postRoutes);
-app.use(createRoutes);
 app.use(authRoutes);
-app.use(readRoutes);
+app.use(createRoutes);
 app.use(profileRoutes);
-app.use(detailRoutes);
-app.use(deleteRoutes);
-
+app.use(readRoutes);
+app.use(quizRoutes);
+app.use(detailsRoutes);
 
 app.listen(port,()=>{
     console.log("connected at ",port);
 });
 
-
 mongodb.connect(MONGODB_URI,()=>{
-    console.log("Connected to mongoose");
+
+    console.log("connected to mongoose");
 });
