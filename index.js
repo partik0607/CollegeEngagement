@@ -20,7 +20,7 @@ const detailRoutes=require("./routers/detail");
 const deleteRoutes=require("./routers/delete");
 
 
-const MONGODB_URI="mongodb//localhost:27017/collegeApp";
+const MONGODB_URI="mongodb+srv://partiksehrawat06:LKPGFvyAPC3NZGqA@collegeenagementapp.mwhtmbh.mongodb.net";
 
 const store=new MongoDBStore({uri:MONGODB_URI,collection:"sessions"});
 
